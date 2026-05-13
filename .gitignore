@@ -1,0 +1,37 @@
+# ====================
+# LEMON🍋 .gitignore
+# ====================
+
+# --- 解析用ファイル・外部ツール ---
+line_decompiled/
+scrcpy/
+apktool.jar
+line_base.apk
+xmls/
+docs/archive/
+
+# --- ビルド生成物 ---
+lemon/app/build/
+lemon/build/
+lemon/.gradle/
+lemon/app/.gradle/
+lemon/local.properties
+
+# --- IDE ---
+lemon/.idea/
+lemon/app/.idea/
+*.iml
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- バイナリ ---
+*.apk
+*.log
+*.hprof
+*.tmp
+*.temp
+
+# --- 参照リポジトリ ---
+references/

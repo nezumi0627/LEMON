@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.github.nezumi0627.lemon">
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.DeviceDefault.Dialog">
+        
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Xposed Module Configuration -->
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+            
+        <meta-data
+            android:name="xposedminversion"
+            android:value="53" />
+            
+        <meta-data
+            android:name="xposeddescription"
+            android:value="LEMON🍋 - LINE UI Customization Module by nezumi0627" />
+            
+        <meta-data
+            android:name="xposedsharedprefs"
+            android:value="lemon_bootstrap" />
+            
+        <meta-data
+            android:name="xposedscope"
+            android:resource="@array/xposed_scope" />
+    </application>
+
+</manifest>
