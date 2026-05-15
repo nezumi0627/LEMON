@@ -6,40 +6,51 @@ set "LEMON_DIR=%PROJECT_ROOT%\lemon"
 set "APK_PATH=%LEMON_DIR%\app\build\outputs\apk\debug\app-debug.apk"
 set "LINE_PACKAGE=jp.naver.line.android"
 
-:menu
-cls
+set "COMMAND=%~1"
+
+if "%COMMAND%"=="" goto usage
+if /I "%COMMAND%"=="all" goto all_process
+if /I "%COMMAND%"=="build_install" goto build_install
+if /I "%COMMAND%"=="build" goto build_only
+if /I "%COMMAND%"=="install" goto install_only
+if /I "%COMMAND%"=="start" goto start_line
+if /I "%COMMAND%"=="stop" goto stop_line
+if /I "%COMMAND%"=="logs" goto view_logs
+if /I "%COMMAND%"=="restart" goto clear_restart
+if /I "%COMMAND%"=="dump" goto dump_ui
+
+:usage
 echo ========================================
 echo LEMON Tools
 echo ========================================
 echo.
-echo 1. Build and install module
-echo 2. Build only
-echo 3. Install only
-echo 4. Start LINE
-echo 5. Stop LINE
-echo 6. View recent LEMON logs
-echo 7. Clear logs and restart LINE
-echo 8. Dump UI hierarchy
-echo 0. Exit
+echo Usage: tool.bat [command]
 echo.
-set /p choice="Choose an option (0-8): "
+echo Commands:
+echo   all             - Build, install, and restart LINE
+echo   build_install   - Build and install module
+echo   build           - Build only
+echo   install         - Install only
+echo   start           - Start LINE
+echo   stop            - Stop LINE
+echo   logs            - View recent LEMON logs
+echo   restart         - Clear logs and restart LINE
+echo   dump            - Dump UI hierarchy
+echo.
+goto exit
 
-if "%choice%"=="1" goto build_install
-if "%choice%"=="2" goto build_only
-if "%choice%"=="3" goto install_only
-if "%choice%"=="4" goto start_line
-if "%choice%"=="5" goto stop_line
-if "%choice%"=="6" goto view_logs
-if "%choice%"=="7" goto clear_restart
-if "%choice%"=="8" goto dump_ui
-if "%choice%"=="0" goto exit
-goto invalid
+:all_process
+call :build_only
+if errorlevel 1 goto exit
+call :install_only
+if errorlevel 1 goto exit
+goto clear_restart
 
 :build_install
 call :build_only
-if errorlevel 1 goto pause_menu
+if errorlevel 1 goto exit
 call :install_only
-goto pause_menu
+goto exit
 
 :build_only
 echo.
@@ -64,19 +75,19 @@ exit /b %ERRORLEVEL%
 echo.
 echo Starting LINE...
 adb shell monkey -p %LINE_PACKAGE% -c android.intent.category.LAUNCHER 1
-goto pause_menu
+goto exit
 
 :stop_line
 echo.
 echo Stopping LINE...
 adb shell am force-stop %LINE_PACKAGE%
-goto pause_menu
+goto exit
 
 :view_logs
 echo.
 echo Recent LEMON logs:
 adb logcat -d | powershell -NoProfile -Command "$input | Select-String 'LEMON' | Select-Object -Last 40"
-goto pause_menu
+goto exit
 
 :clear_restart
 echo.
@@ -86,7 +97,7 @@ adb shell am force-stop %LINE_PACKAGE%
 adb shell monkey -p %LINE_PACKAGE% -c android.intent.category.LAUNCHER 1
 timeout /t 3 /nobreak >nul
 adb logcat -d | powershell -NoProfile -Command "$input | Select-String 'LEMON' | Select-Object -Last 40"
-goto pause_menu
+goto exit
 
 :dump_ui
 echo.
@@ -94,17 +105,7 @@ echo Dumping UI hierarchy...
 adb shell uiautomator dump /sdcard/lemon_dump.xml
 adb pull /sdcard/lemon_dump.xml "%PROJECT_ROOT%\xmls\lemon_dump.xml"
 powershell -NoProfile -Command "Select-String -Path '%PROJECT_ROOT%\xmls\lemon_dump.xml' -Pattern 'LEMON' | ForEach-Object { $_.Line }"
-goto pause_menu
-
-:invalid
-echo.
-echo Invalid option. Choose 0-8.
-goto pause_menu
-
-:pause_menu
-echo.
-pause
-goto menu
+goto exit
 
 :exit
 endlocal

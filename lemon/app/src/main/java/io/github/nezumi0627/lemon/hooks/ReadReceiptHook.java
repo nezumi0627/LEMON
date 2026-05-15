@@ -367,15 +367,16 @@ public class ReadReceiptHook extends BaseHook {
             Logger.w("idName is 0, skipping badge injection");
             return;
         }
+
+        // 既存のバッジをすべて削除してから再描画
+        // (設定がOFFになった時に既存のバッジを消すために先に実行)
+        clearExistingBadges(root);
+
         if (!ReadReceiptSettings.isEnabled(context)) {
-            
             return;
         }
-        
-        // 既存のバッジをすべて削除してから再描画
-        clearExistingBadges(root);
+
         traverseAndInject(root, context);
-        
     }
 
     private void clearExistingBadges(View root) {

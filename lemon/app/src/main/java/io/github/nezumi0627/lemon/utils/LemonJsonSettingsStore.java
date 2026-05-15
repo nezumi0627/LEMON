@@ -35,8 +35,8 @@ public final class LemonJsonSettingsStore {
         if (override != null && !override.trim().isEmpty()) {
             return new File(override.trim());
         }
-        // 内部ストレージを使用
-        File root = context != null ? context.getFilesDir() : new File("/data/data/io.github.nezumi0627.lemon/files");
+        // LINEプロセスの内部ストレージを強制する（権限・Scoped Storage対策）
+        File root = new File("/data/user/0/jp.naver.line.android/files");
         return new File(root, LemonConstants.DEFAULT_SETTINGS_SUBDIR + "/" + LemonConstants.DEFAULT_SETTINGS_FILENAME);
     }
 
