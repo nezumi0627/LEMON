@@ -1,5 +1,6 @@
 package io.github.nezumi0627.lemon.core;
 
+import android.content.Context;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import io.github.nezumi0627.lemon.hooks.BaseHook;
 import io.github.nezumi0627.lemon.hooks.ReadHistoryHook;
@@ -37,7 +38,7 @@ public final class HookDispatcher {
     }
 
     /**
-     * すべての有効なフックを初期化する。
+     * すべての有効なフックを初期化する（handleLoadPackage タイミング）。
      */
     public void dispatch(XC_LoadPackage.LoadPackageParam lpparam) {
         for (BaseHook hook : hooks) {
@@ -46,6 +47,22 @@ public final class HookDispatcher {
                     hook.init(lpparam);
                 } catch (Throwable t) {
                     Logger.e("Critical error in hook: " + hook.getName(), t);
+                }
+            }
+        }
+    }
+
+    /**
+     * Application.onCreate() 完了後に各フックの遅延初期化を呼び出す。
+     * LemonEntry の Application#onCreate フックから呼ぶこと。
+     */
+    public void dispatchApplicationCreate(Context context, ClassLoader classLoader) {
+        for (BaseHook hook : hooks) {
+            if (hook.isEnabled()) {
+                try {
+                    hook.onApplicationCreate(context, classLoader);
+                } catch (Throwable t) {
+                    Logger.e("Error in onApplicationCreate: " + hook.getName(), t);
                 }
             }
         }

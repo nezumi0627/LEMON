@@ -9,6 +9,7 @@ apktool.jar
 line_base.apk
 xmls/
 docs/archive/
+dbs/
 
 # --- ビルド生成物 ---
 lemon/app/build/

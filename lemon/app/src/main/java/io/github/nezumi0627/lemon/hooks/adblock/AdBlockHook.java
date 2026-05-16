@@ -1,5 +1,6 @@
 package io.github.nezumi0627.lemon.hooks.adblock;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,11 +94,15 @@ public class AdBlockHook extends BaseHook {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     View newElement = (View) param.args[0];
-                    if (newElement != null && isBlockedElement(newElement.getClass().getName())) {
-                        if (LemonSettings.getBoolean(newElement.getContext(), LemonConstants.KEY_AD_BLOCK, true)) {
+                    if (newElement == null) return;
+                    if (!isBlockedElement(newElement.getClass().getName())) return;
+                    try {
+                        Context ctx = newElement.getContext();
+                        if (ctx == null) return;
+                        if (LemonSettings.getBoolean(ctx, LemonConstants.KEY_AD_BLOCK, true)) {
                             newElement.setVisibility(View.GONE);
                         }
-                    }
+                    } catch (Exception ignored) {}
                 }
             });
         } catch (Throwable t) {

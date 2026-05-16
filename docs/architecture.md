@@ -41,16 +41,27 @@ lemon/app/src/main/java/io/github/nezumi0627/lemon/
 | 登録画面ボタン | `RegistrationHook`, `LemonButton` |
 | AI 導線置換 | `ChatAiAssistantHook`, `LemonSettingsUI` |
 | Info ライセンス表示 | `LemonSettingsUI`, `ModuleAssetReader` |
-| Chat ID コピー | `ChatListDialogHook` |
+| Chat ID コピー | `ChatListDialogHook`, `LineDbHelper` |
 | 広告ブロック | `AdBlockHook` |
-| 既読回避 | `ReadReceiptHook` |
-| 既読履歴管理 | `ReadHistoryHook` |
+| 既読回避 | `ReadReceiptHook`, `LineDbHelper` |
+| 既読履歴管理 | `ReadHistoryHook`, `LineDbHelper` |
 | テーマ適用 | `ThemeManager`, `ThemeDownloader`, `ThemeHook` |
 | テーマストック管理 | `ThemeStockManager`, `LemonSettingsUI` |
 | テーマストック行UI | `ThemeStockRowFactory` |
 | サブ端末テーマ補助 | `SecondaryDeviceThemeHook` |
 | 自動変更履歴 | `ChangelogManager`, `LemonEntry` |
-| プロフィール解決 | `ProfileResolver` |
+| プロフィール解決 | `ProfileResolver`, `LineDbHelper` |
+
+## DB アクセス層
+
+複数のフックで必要になる LINE の SQLite 操作は `LineDbHelper` に集約しています。
+直接 DB パスを叩くコードを各フックに書かず、このクラスを経由してください。
+
+- `getMyMid()` ― 自分の MID を naver_line から取得
+- `getDisplayName(mid)` ― 連絡先名の解決
+- `getPicturePath(mid)` ― プロフィール画像パス
+- `resolveChatIdByName(name)` ― 表示名から MID/GID を解決
+- `getMessageContent(chatId, messageId)` ― メッセージ本文を取得
 
 ## データ保存
 

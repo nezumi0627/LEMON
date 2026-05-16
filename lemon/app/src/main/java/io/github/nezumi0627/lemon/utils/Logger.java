@@ -35,4 +35,9 @@ public final class Logger {
     public static void d(String msg) {
         Log.d(LemonConstants.LOG_TAG, msg);
     }
+
+    /** デバッグログが有効かどうか（Log.isLoggable で判定）。 */
+    public static boolean isDebugEnabled() {
+        return Log.isLoggable(LemonConstants.LOG_TAG, Log.DEBUG);
+    }
 }

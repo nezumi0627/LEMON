@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -29,8 +27,11 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import io.github.nezumi0627.lemon.analysis.ObfuscationCache;
+import io.github.nezumi0627.lemon.analysis.ObfuscationRegistry;
 import io.github.nezumi0627.lemon.bridge.HookHelper;
 import io.github.nezumi0627.lemon.constants.LemonConstants;
+import io.github.nezumi0627.lemon.utils.LineDbHelper;
 import io.github.nezumi0627.lemon.utils.Logger;
 import io.github.nezumi0627.lemon.utils.ReadReceiptSettings;
 
@@ -50,19 +51,24 @@ public class ReadReceiptHook extends BaseHook {
     private static final long READ_RECEIPT_BYPASS_MS = 100L;
 
     // -----------------------------------------------------------------------
-    // LINEクラス・メソッド名（難読化済み）
+    // LINEクラス・メソッド名（ObfuscationRegistry から動的取得）
     // -----------------------------------------------------------------------
-    /** {@link LemonConstants#TARGET_LINE_VERSION} 向けに解析した難読化名 */
-    private static final String RR_MANAGER_CLASS = "at2.e";
-    private static final String RR_METHOD_SEND_READ_RECEIPT = "d";
-    private static final String RR_METHOD_EXECUTE_READ_RECEIPT_ASYNC = "e";
-    private static final String RR_METHOD_READ_ALL = "c";
+    /**
+     * TalkClient は固定パッケージ名なので定数のまま。
+     * その他の難読化名は onApplicationCreate() で ObfuscationRegistry から取得する。
+     */
     private static final String RR_TALK_CLIENT_CLASS =
             "jp.naver.line.android.thrift.client.impl.LegacyTalkServiceClientImpl";
-    private static final String RR_THRIFT_DISPATCH = "r1";
-    private static final String RR_SEND_MESSAGE = "u0";
-    private static final String RR_BADGE_CLEAR_CLASS = "dc8.b";
-    private static final String RR_BADGE_CLEAR_METHOD = "e";
+
+    // 実行時に ObfuscationRegistry から設定される（onApplicationCreate 後に有効）
+    private String RR_MANAGER_CLASS;
+    private String RR_METHOD_SEND_READ_RECEIPT;
+    private String RR_METHOD_EXECUTE_READ_RECEIPT_ASYNC;
+    private String RR_METHOD_READ_ALL;
+    private String RR_THRIFT_DISPATCH;
+    private String RR_SEND_MESSAGE;
+    private String RR_BADGE_CLEAR_CLASS;
+    private String RR_BADGE_CLEAR_METHOD;
 
     // -----------------------------------------------------------------------
     // 実行時状態
@@ -702,22 +708,7 @@ public class ReadReceiptHook extends BaseHook {
     }
 
     private String resolveChatIdByName(Context context, String name) {
-        if (name == null || name.isEmpty()) return null;
-        String dbPath = "/data/user/0/jp.naver.line.android/databases/contact";
-        try (SQLiteDatabase db = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS)) {
-            try (Cursor cursor = db.rawQuery("SELECT mid FROM contacts WHERE profile_name = ? OR overridden_name = ? OR address_book_name = ? LIMIT 1", new String[]{name, name, name})) {
-                if (cursor.moveToFirst()) return cursor.getString(0);
-            }
-        } catch (Throwable ignored) {
-        }
-        String chatDbPath = "/data/user/0/jp.naver.line.android/databases/naver_line";
-        try (SQLiteDatabase db = SQLiteDatabase.openDatabase(chatDbPath, null, SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS)) {
-            try (Cursor cursor = db.rawQuery("SELECT id FROM groups WHERE name = ? LIMIT 1", new String[]{name})) {
-                if (cursor.moveToFirst()) return cursor.getString(0);
-            }
-        } catch (Throwable ignored) {
-        }
-        return null;
+        return LineDbHelper.resolveChatIdByName(name);
     }
 
     private int dp(Context context, int value) {

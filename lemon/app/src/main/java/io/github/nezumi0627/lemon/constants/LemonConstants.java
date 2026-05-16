@@ -79,4 +79,27 @@ public final class LemonConstants {
     // --- 文字列置換 ---
     public static final String ORIGINAL_WELCOME = "LINEへようこそ";
     public static final String REPLACED_WELCOME = "LEMON🍋へようこそ";
+
+    // -----------------------------------------------------------------------
+    // 難読化名フォールバック定数 (LINE v26.6.1 解析済み実績値)
+    // ObfuscationRegistry がキャッシュ未ヒット時にこの値を使用する。
+    // アップデート後に DynamicAnalyzer が新しい値を解析してキャッシュに保存するまでの橋渡し。
+    // -----------------------------------------------------------------------
+
+    /** ReadReceiptManager クラス名 */
+    public static final String RR_MANAGER_CLASS_DEFAULT          = "at2.e";
+    /** ReadReceiptManager#sendReadReceipt(long, String, boolean) メソッド名 */
+    public static final String RR_SEND_METHOD_DEFAULT            = "d";
+    /** ReadReceiptManager#executeReadReceiptAsync(String) メソッド名 */
+    public static final String RR_EXEC_ASYNC_METHOD_DEFAULT      = "e";
+    /** ReadReceiptManager#readAll() メソッド名 */
+    public static final String RR_READ_ALL_METHOD_DEFAULT        = "c";
+    /** LegacyTalkServiceClientImpl の Thrift ディスパッチメソッド名 */
+    public static final String RR_THRIFT_DISPATCH_DEFAULT        = "r1";
+    /** LegacyTalkServiceClientImpl#sendMessage メソッド名 */
+    public static final String RR_SEND_MESSAGE_DEFAULT           = "u0";
+    /** バッジクリアクラス名 */
+    public static final String RR_BADGE_CLEAR_CLASS_DEFAULT      = "dc8.b";
+    /** バッジクリアメソッド名 */
+    public static final String RR_BADGE_CLEAR_METHOD_DEFAULT     = "e";
 }

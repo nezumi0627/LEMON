@@ -37,6 +37,12 @@ public class LemonEntry implements IXposedHookLoadPackage {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Context ctx = (Context) param.thisObject;
+                    ClassLoader cl = ctx.getClassLoader();
+
+                    // Application.onCreate 完了後に遅延フックを実行
+                    // (t88.k, r88.a 等マルチdex後段クラスはここで初めて ClassLoader に載る)
+                    dispatcher.dispatchApplicationCreate(ctx, cl);
+
                     ChangelogManager.trackCurrentVersion(ctx);
                     if (!LemonSettings.getBoolean(ctx, LemonConstants.KEY_STARTUP_TOAST_ENABLED, false)) {
                         return;

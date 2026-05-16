@@ -43,6 +43,7 @@
 |---|---|
 | `utils/LemonSettings.java` | 設定アクセス API |
 | `utils/LemonJsonSettingsStore.java` | JSON 設定ストア本体 |
+| `utils/LineDbHelper.java` | LINE SQLite DB への共通アクセス（MID / チャット名解決 / メッセージ取得） |
 | `utils/Logger.java` | ログ出力制御 |
 | `utils/IntentUtils.java` | 外部 Intent 補助 |
 | `utils/ModuleAssetReader.java` | モジュール assets 読み出し |

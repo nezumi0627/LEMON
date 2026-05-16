@@ -23,9 +23,8 @@ import java.util.zip.ZipFile;
 
 public class ThemeManager {
     
-    private static final String DEFAULT_THEME_ID = "3e261192-3a69-4849-b35d-35aeddd5a368";
     private static final String LINE_THEME_PREF_NAME = "ThemeManager";
-    private static final String LINE_THEME_PREF_KEY = "ThemePackageName";
+    private static final String LINE_THEME_PREF_KEY  = "ThemePackageName";
     private static final String THEME_ROOT_DIR = "theme";
     private static final String THEME_LOAD_DIR = "load";
     private static final String THEME_IMAGE_DIR = "images";
@@ -254,7 +253,7 @@ public class ThemeManager {
             return;
         }
 
-        setLineThemeId(context, DEFAULT_THEME_ID);
+        setLineThemeId(context, LemonConstants.THEME_ID_DEFAULT);
         clearOfficialThemeCheckFlags(context);
         Logger.i("LINE ThemeManager preference kept at default to avoid official theme verification loop");
 
@@ -437,8 +436,8 @@ public class ThemeManager {
     }
 
     private static void resetThemeOverrideState(Context context) {
-        setLineThemeId(context, DEFAULT_THEME_ID);
-        LemonSettings.setString(context, LemonConstants.KEY_THEME_FORCE_ID, DEFAULT_THEME_ID);
+        setLineThemeId(context, LemonConstants.THEME_ID_DEFAULT);
+        LemonSettings.setString(context, LemonConstants.KEY_THEME_FORCE_ID, LemonConstants.THEME_ID_DEFAULT);
         LemonSettings.setBoolean(context, LemonConstants.KEY_THEME_FORCE_ENABLED, false);
     }
 }
