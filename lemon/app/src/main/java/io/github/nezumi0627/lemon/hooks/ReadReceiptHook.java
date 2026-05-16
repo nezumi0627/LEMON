@@ -86,12 +86,32 @@ public class ReadReceiptHook extends BaseHook {
 
     @Override
     public void init(XC_LoadPackage.LoadPackageParam lpparam) {
-        // UIフック
+        // UI フックは handleLoadPackage タイミングで登録（Activity クラスは常に使用可能）
         hookChatHeaderButton();
         hookChatListLongPressDialog();
         hookChatListIndicator();
-        // 既読送信フック
-        hookKnownReadReceiptMethods(lpparam.classLoader);
+        // 既読送信フックは onApplicationCreate() で ObfuscationRegistry 初期化後に登録する
+    }
+
+    @Override
+    public void onApplicationCreate(Context context, ClassLoader classLoader) {
+        // ObfuscationRegistry から難読化名を取得（DynamicAnalyzer 解析後に呼ばれる）
+        RR_MANAGER_CLASS              = ObfuscationRegistry.get(ObfuscationCache.KEY_RR_MANAGER_CLASS);
+        RR_METHOD_SEND_READ_RECEIPT   = ObfuscationRegistry.get(ObfuscationCache.KEY_RR_SEND_METHOD);
+        RR_METHOD_EXECUTE_READ_RECEIPT_ASYNC = ObfuscationRegistry.get(ObfuscationCache.KEY_RR_EXEC_ASYNC_METHOD);
+        RR_METHOD_READ_ALL            = ObfuscationRegistry.get(ObfuscationCache.KEY_RR_READ_ALL_METHOD);
+        RR_THRIFT_DISPATCH            = ObfuscationRegistry.get(ObfuscationCache.KEY_TALK_CLIENT_THRIFT_DISPATCH);
+        RR_SEND_MESSAGE               = ObfuscationRegistry.get(ObfuscationCache.KEY_TALK_CLIENT_SEND_MESSAGE);
+        RR_BADGE_CLEAR_CLASS          = ObfuscationRegistry.get(ObfuscationCache.KEY_BADGE_CLEAR_CLASS);
+        RR_BADGE_CLEAR_METHOD         = ObfuscationRegistry.get(ObfuscationCache.KEY_BADGE_CLEAR_METHOD);
+
+        Logger.i("ReadReceiptHook: 難読化名ロード完了"
+                + " manager=" + RR_MANAGER_CLASS
+                + " send=" + RR_METHOD_SEND_READ_RECEIPT
+                + " thrift=" + RR_THRIFT_DISPATCH);
+
+        // 既読送信フックを登録
+        hookKnownReadReceiptMethods(classLoader);
     }
 
     // -----------------------------------------------------------------------

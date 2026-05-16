@@ -10,6 +10,7 @@ import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import io.github.nezumi0627.lemon.analysis.VersionUpdateCoordinator;
 import io.github.nezumi0627.lemon.constants.LemonConstants;
 import io.github.nezumi0627.lemon.utils.ChangelogManager;
 import io.github.nezumi0627.lemon.core.HookDispatcher;
@@ -29,6 +30,9 @@ public class LemonEntry implements IXposedHookLoadPackage {
         LemonConstants.MODULE_PATH = lpparam.appInfo.sourceDir;
         Logger.i("=== " + LemonConstants.MODULE_NAME + " v" + LemonConstants.MODULE_VERSION + " by " + LemonConstants.MODULE_AUTHOR + " ===");
 
+        // アップデート検知の準備（バージョン情報は onApplicationCreate で確認）
+        VersionUpdateCoordinator.onLoadPackage();
+
         // フックの実行
         dispatcher.dispatch(lpparam);
 
@@ -38,6 +42,10 @@ public class LemonEntry implements IXposedHookLoadPackage {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Context ctx = (Context) param.thisObject;
                     ClassLoader cl = ctx.getClassLoader();
+
+                    // バージョン検知 → 動的解析 → ObfuscationRegistry 初期化
+                    // (この後 dispatchApplicationCreate が ObfuscationRegistry を参照するため先に実行)
+                    VersionUpdateCoordinator.onApplicationCreate(ctx, cl);
 
                     // Application.onCreate 完了後に遅延フックを実行
                     // (t88.k, r88.a 等マルチdex後段クラスはここで初めて ClassLoader に載る)
